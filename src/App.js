@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TodoList from "./TodoList";
 
 export default function App() {
@@ -9,12 +9,18 @@ export default function App() {
   //   ],
   // // };
 
-  const [todos, setTodos] = useState([
-    { id: 1, title: "First todo", completed: false },
-    { id: 2, title: "Second todo", completed: false },
-  ],)
+  const [todos, setTodos] = useState([])
 
   const [todoValue, setTodoValue] = useState('')
+
+  useEffect(() => {
+    const raw = localStorage.getItem('todos') || []
+    setTodos(JSON.parse(raw))
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
 
   const updateTodoValue = (event) => {
     if (event.key === 'Enter') {
