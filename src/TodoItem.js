@@ -3,7 +3,7 @@ import { Context } from './context'
 
 export default function TodoItem({title, id, completed}) {
   const cls = ['todo']
-  const {toggleTodo, removeTodo} = useContext(Context)
+  const {dispatch} = useContext(Context)
 
   if (completed) {
     cls.push('completed')
@@ -15,13 +15,19 @@ export default function TodoItem({title, id, completed}) {
         <input
           type="checkbox"
           checked={completed}
-          onChange={()=>toggleTodo(id)}
+          onChange={()=>dispatch({
+            type: 'toggle',
+            payload: id
+          })}
         />
         <span>{title}</span>
 
         <i
           className="material-icons red-text"
-          onClick={()=>removeTodo(id)}
+          onClick={()=>dispatch({
+            type: 'remove',
+            payload: id
+          })}
         >
           delete
         </i>

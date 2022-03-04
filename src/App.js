@@ -1,59 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { Context } from "./context";
+import reducer from "./reducer";
 import TodoList from "./TodoList";
 
 export default function App() {
-  // state = {
-  //   todos: [
-  //     { id: 1, title: "First todo", completed: false },
-  //     { id: 2, title: "Second todo", completed: false },
-  //   ],
-  // // };
-
-  const [todos, setTodos] = useState([]);
+  const [state, dispatch] = useReducer(
+    reducer,
+    JSON.parse(localStorage.getItem("todos"))
+  );
 
   const [todoValue, setTodoValue] = useState("");
 
   useEffect(() => {
-    const raw = localStorage.getItem("todos") || [];
-    setTodos(JSON.parse(raw));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+    localStorage.setItem("todos", JSON.stringify(state));
+  }, [state]);
 
   const updateTodoValue = (event) => {
     if (event.key === "Enter") {
-      setTodos([
-        ...todos,
-        {
-          id: Date.now(),
-          title: todoValue,
-          completed: false,
-        },
-      ]);
+      dispatch({
+        type: 'add',
+        payload: todoValue
+      })
       setTodoValue("");
     }
   };
 
-  const removeTodo = (id) => {
-    setTodos(todos.filter(todo => {
-      return todo.id !== id
-    }))
-  }
+  // const removeTodo = (id) => {
+  //   setTodos(todos.filter(todo => {
+  //     return todo.id !== id
+  //   }))
+  // }
 
-  const toggleTodo = (id) => {
-    setTodos(todos.map(todo => {
-      if (todo.id === id) {
-        todo.completed = !todo.completed
-      }
-      return todo
-    }))
-  }
+  // const toggleTodo = (id) => {
+  //   setTodos(todos.map(todo => {
+  //     if (todo.id === id) {
+  //       todo.completed = !todo.completed
+  //     }
+  //     return todo
+  //   }))
+  // }
 
   return (
-    <Context.Provider value={{toggleTodo, removeTodo}}>
+    <Context.Provider
+      value={
+        {
+          dispatch
+        }
+      }
+    >
       <div className="container">
         <h1>Todo app</h1>
 
@@ -67,7 +61,7 @@ export default function App() {
           <label>Todo name</label>
         </div>
 
-        <TodoList todos={todos} />
+        <TodoList todos={state} />
       </div>
     </Context.Provider>
   );
